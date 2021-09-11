@@ -15,7 +15,7 @@ class TabuSearch :
 
     #1) Random initial solution
 
-
+    #new comment
         self.initial_solution = random.sample(self.Coords , len(self.Coords))
 
     
