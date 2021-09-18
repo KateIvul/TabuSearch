@@ -1,6 +1,6 @@
 from os import name
 import numpy as np
-import pandas as pd
+import re
 import math
 
 from numpy.core.defchararray import index
@@ -9,14 +9,18 @@ class TSPReader :
 
     #open , read and extract information from the tsp file
 
-    def __init__(self , file) :
+    def __init__(self , file , file_opt) :
         
         self.file = file
+        self.file_opt = file_opt
         self.name = ""
         self.type = ""
         self.dimension = 0
+        self.lenght_opt_tour = 0
         self.matrixDistance = None
         self.coords = list()
+        self.opt_tour = list()
+        self.opt_coords = list()
 
        #OPENING THE FILE
 
@@ -38,11 +42,31 @@ class TSPReader :
 
                 self.coords.append(Coordinate(int(linesplit[1]) ,int(linesplit[2]) ))   
 
-            #DISTANCE MATRIX
+        #OPEN THE OPT FILE
+        with open(file_opt) as tsp_opt_file :
 
-            self.matrixDistance = TSPReader.distance_total_2D(self.coords)
+            lines = tsp_opt_file.readlines()       #readlines() – read all the lines of the text file and return them as a list of strings.
 
-            #2D TOTAL DISTANCE (UTILITY FUNCTION)
+          #PARSING THE FILE I
+
+            self.name = lines[0][6:]   
+            self.lenght_opt_tour = lines[1][39:42]  #use regex
+            self.type = lines[2][6:]     
+            self.dimension = lines[3][11:]
+
+          #PARSING THE FILE II
+
+            for i,value in enumerate(lines[5: -1]) :                              #from line 5 to the EOF...
+
+                 self.opt_tour.append(int(value))
+
+            for tour in self.opt_tour :
+                
+                self.opt_coords.append(self.coords[tour-1])
+
+
+            
+    #2D TOTAL DISTANCE (UTILITY FUNCTION)
 
     @staticmethod
     def distance_total_2D(coords) :
@@ -73,6 +97,10 @@ class TSPReader :
 
         return self.type
 
+    def get_lenght_opt_tour(self) :
+
+        return self.lenght_opt_tour
+
 
 class Coordinate :
 
@@ -101,16 +129,28 @@ class Coordinate :
 if __name__=="__main__" :
 
     print("Demo TSPReader class...\n")
-    test = TSPReader(r"C:\Users\Cater\OneDrive\Desktop\UNIVERSITA\RO\ELABORATO 2.0\ISTANZE DI PROVA\eil51.tsp")
+    #test = TSPReader(r"C:\Users\Cater\OneDrive\Desktop\UNIVERSITA\RO\ELABORATO 2.0\ISTANZE DI PROVA\eil51.tsp")
+    test = TSPReader("eil51.tsp" , "eil51.opt.tour.txt")
 
     print("Computing...\n")
 
-    problem_name = test.get_name()
-    problem_dimension = test.get_dimension()
-    problem_type = test.get_type()
-    test_coord = test.coords
-    print("COORDS = " ,  test_coord)
+    #problem_name = test.get_name()
+    #problem_dimension = test.get_dimension()
+    #problem_type = test.get_type()
+    #test_coord = test.coords
+    #print("COORDS = " ,  test_coord)
 
+    opt_name = test.get_name()
+    opt_dimension = test.get_dimension()
+    opt_type = test.get_type()
+    opt_lenght = test.get_lenght_opt_tour()
+    opt_coords = test.opt_coords
+
+    print("OPT NAME = " , opt_name , "\n")
+    print("OPT DIMENSION = " , opt_dimension , "\n")
+    print("OPT TYPE = " , opt_type , "\n")
+    print("OPT LENGHT = " , opt_lenght , "\n")
+    print("OPT TOUR =  " , opt_coords)
 
     #print("PROBLEM NAME = " , problem_name , "\n")
     #print("PROBLEM DIMENSION = " , problem_dimension , "\n")
@@ -130,7 +170,7 @@ if __name__=="__main__" :
 
     #print("DEMO Coordinates class...\n")
     #test_coord = Coordinates( x_coordinate , y_coordinate)
-    print("DISTANCE MATRIX : \n" , test.matrixDistance)
+    #print("DISTANCE MATRIX : \n" , test.matrixDistance)
     
 
 
