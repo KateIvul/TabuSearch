@@ -124,6 +124,13 @@ class Coordinate :
     
     def __repr__(self) -> str:
         return str(self)
+
+    def __eq__(self, o: object) -> bool:
+        if isinstance(o, Coordinate):
+            return self.x == o.x and self.y == o.y
+        else:
+            return False
+
 #TESTING
 
 if __name__=="__main__" :
@@ -171,6 +178,10 @@ if __name__=="__main__" :
     #print("DEMO Coordinates class...\n")
     #test_coord = Coordinates( x_coordinate , y_coordinate)
     #print("DISTANCE MATRIX : \n" , test.matrixDistance)
+
+    l1 = [Coordinate(1,2), Coordinate(2,1)]
+    l2 = [Coordinate(1,2), Coordinate(2,1)]
+    print(l1==l2)
     
 
 
