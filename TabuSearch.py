@@ -77,12 +77,20 @@ class TabuSearch :
             
     def get_best_candidate(self, neighborhood , tabu_list, current_solution) :
 
-        ret = current_solution.copy()
+        optSol = current_solution.copy()
         #return min([self.fitness(x) for x in neighborhood])
+        newSol = neighborhood[0] #could be worse
         for s in neighborhood:
-            if (TabuSearch.fitness(s) < TabuSearch.fitness(ret)) and (s not in tabu_list):
-                   ret = s
-        return ret
+            if (TabuSearch.fitness(s) < TabuSearch.fitness(optSol)) and (s not in tabu_list):
+                optSol = s
+            elif TabuSearch.fitness(s) < TabuSearch.fitness(newSol) and (s not in tabu_list):
+                newSol = s
+            else:
+                pass
+        if optSol != current_solution:
+            return optSol
+        else:
+            return newSol
 
     def stop(self, iteration):
         if iteration == self.max_iteration:
