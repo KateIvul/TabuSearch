@@ -7,7 +7,7 @@ from numpy.core.defchararray import index
 
 class TSPReader :
 
-    #open , read and extract information from the tsp file
+    #open , read and extract information from the tsp file and the opt file
 
     def __init__(self , file , file_opt) :
         
@@ -22,7 +22,7 @@ class TSPReader :
         self.opt_tour = list()
         self.opt_coords = list()
 
-       #OPENING THE FILE
+       #OPEN THE FILE
 
         with open(file) as tspfile :        #with open(...) as ... automatically close the file "
 
@@ -50,7 +50,8 @@ class TSPReader :
           #PARSING THE FILE I
 
             self.name = lines[0][6:]   
-            self.lenght_opt_tour = lines[1][39:42]  #use regex
+            #self.lenght_opt_tour = int(lines[1][39:42])  #use regex
+            self.lenght_opt_tour = int(re.search(".*\((\d+)\)",lines[1]).group(1))  #use regex
             self.type = lines[2][6:]     
             self.dimension = lines[3][11:]
 
@@ -73,7 +74,7 @@ class TSPReader :
 
         #PRE-ALLOCATION TEMP MATRIX
 
-        matrixTemp = np.zeros( (int(len(coords)) , int( len(coords)) ) )                # (51 x 51)
+        matrixTemp = np.zeros( (int(len(coords)) , int( len(coords)) ) )                
 
         #COMPUTING TOTAL DISTANCE
 
@@ -118,14 +119,14 @@ class Coordinate :
 
         return distance
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:       #represent the class objects as a string to simplify visualization
         
         return "[{},{}]".format(self.x, self.y)
     
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:      #represent the class objects as a string
         return str(self)
 
-    def __eq__(self, o: object) -> bool:
+    def __eq__(self, o: object) -> bool:           #overloading operator "=="
         if isinstance(o, Coordinate):
             return self.x == o.x and self.y == o.y
         else:
@@ -137,15 +138,17 @@ if __name__=="__main__" :
 
     print("Demo TSPReader class...\n")
     #test = TSPReader(r"C:\Users\Cater\OneDrive\Desktop\UNIVERSITA\RO\ELABORATO 2.0\ISTANZE DI PROVA\eil51.tsp")
-    test = TSPReader("eil51.tsp" , "eil51.opt.tour.txt")
+    test = TSPReader("eil51.tsp" , "eil51.opt.tour.txt")        #path locale
 
     print("Computing...\n")
 
-    #problem_name = test.get_name()
-    #problem_dimension = test.get_dimension()
-    #problem_type = test.get_type()
-    #test_coord = test.coords
-    #print("COORDS = " ,  test_coord)
+    problem_name = test.get_name()
+    problem_dimension = test.get_dimension()
+    problem_type = test.get_type()
+    test_coord = test.coords
+    print("PROBLEM NAME = " , problem_name , "\n")
+    print("PROBLEM DIMENSION = " , problem_dimension , "\n")
+    print("COORDS = " ,  test_coord , "\n")
 
     opt_name = test.get_name()
     opt_dimension = test.get_dimension()
@@ -158,22 +161,6 @@ if __name__=="__main__" :
     print("OPT TYPE = " , opt_type , "\n")
     print("OPT LENGHT = " , opt_lenght , "\n")
     print("OPT TOUR =  " , opt_coords)
-
-    #print("PROBLEM NAME = " , problem_name , "\n")
-    #print("PROBLEM DIMENSION = " , problem_dimension , "\n")
-    #print("PROBLEM TYPE = " , problem_type , "\n\n")
-
-    #ARRAY CHECK
-    #print("X COORDINATE : \n" , x_coordinate , "\n" )
-    #print("Y COORDINATE : \n" , y_coordinate , "\n" )
-
-    #print(x_coordinate[3] , "\n")
-    #print(y_coordinate[1] , "\n")
-
-    #ARRAY DIMENSION
-    #print("ARRAY X DIMENSION : " , len(x_coordinate) , "\n")
-    #print("ARRAY Y DIMENSION : " , len(y_coordinate) , "\n")
-    #print("\n\n")
 
     #print("DEMO Coordinates class...\n")
     #test_coord = Coordinates( x_coordinate , y_coordinate)

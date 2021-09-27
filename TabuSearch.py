@@ -13,17 +13,19 @@ class TabuSearch :
 
     #-----ALGORITHM-----
 
-    #1) Random initial solution
+    #1) Individuazione di una soluzione iniziale di innesco del processo di ricerca
 
     
         self.initial_solution = random.sample(self.Coords , len(self.Coords))
 
     
-    #DEFINITION OF THE 2-OPT SWAP
+    #2) Costruzione intorno
 
     def get_neighborhood(self , current_solution) :
 
         return self.two_opt_move(current_solution)
+
+    #DEFINITION OF THE 2-OPT SWAP
 
     def two_opt_move(self , current_solution) :
 
@@ -36,8 +38,6 @@ class TabuSearch :
                 list_of_solution.append(solution)
         
         return list_of_solution
-
-
 
     def two_opt_move_1(self , current_solution) :
 
@@ -78,10 +78,9 @@ class TabuSearch :
     def get_best_candidate(self, neighborhood , tabu_list, current_solution) :
 
         optSol = current_solution.copy()
-        #return min([self.fitness(x) for x in neighborhood])
-        newSol = neighborhood[0] #could be worse
+        newSol = neighborhood[0]        #could be worse
         for s in neighborhood:
-            if (TabuSearch.fitness(s) < TabuSearch.fitness(optSol)) and (s not in tabu_list):
+            if (TabuSearch.fitness(s) < TabuSearch.fitness(optSol)) and (s not in tabu_list):   
                 optSol = s
             elif TabuSearch.fitness(s) < TabuSearch.fitness(newSol) and (s not in tabu_list):
                 newSol = s
@@ -102,64 +101,70 @@ class TabuSearch :
 
         print("TABU SEARCH ALGORITHM....\n\n")
 
+        #1) INIZIALIZZAZIONE: Individuazione di una soluzione di innesco del processo di ricerca
         best_solution = self.initial_solution
         best_candidate = self.initial_solution
         best_fitness = TabuSearch.fitness(best_solution)
         
-        #print("BEST SOLUTION = " , best_solution , "\n\n")
-        #print("BEST FITNESS = " , best_fitness , "\n\n")
-
         #----TABU LIST MECHANISM----
         tabu_list = list()
         tabu_list.append(best_solution)
-        #print("TABU LIST = " , tabu_list , "\n\n")
+        
         iteration = 0
 
         while not self.stop(iteration) :
             print(iteration)
             iteration = iteration + 1
-            #2) Creation of the neighborhood 
-            my_neighborhood = self.get_neighborhood(best_candidate)
-            #print("MY NEIGHBORHOOD = " , my_neighborhood)
-            best_candidate = self.get_best_candidate(my_neighborhood, tabu_list, best_candidate)
-            #print("BEST CANDIDATE = " , best_candidate , "\n\n")
 
+            #2) COSTRUZIONE INTORNO
+            my_neighborhood = self.get_neighborhood(best_candidate)
+           
+           #3) DETERMINAZIONE DI UNA NUOVA SOLUZIONE: Si individua una nuova soluzione appartenente all'intorno... 
+            best_candidate = self.get_best_candidate(my_neighborhood, tabu_list, best_candidate)
 
             #CHECK THE FITNESS
 
+            #3)...che sia migliore della soluzione precedente sulla base di un certo stimatore dopodichè si sostituisce tale soluzione trovata
+            #     con la precedente
+
             if ( TabuSearch.fitness(best_candidate) < TabuSearch.fitness(best_solution)) :
                 print("NEW SOLUTION FOUND")
-                best_solution = best_candidate
-                best_fitness = TabuSearch.fitness(best_solution)
+                best_solution = best_candidate                      #sostituzione
+                best_fitness = TabuSearch.fitness(best_solution)    #aggiornamento fitness
             else:
                 print("NO NEW SOLUTION FOUND")
+
             #UPDATE TABU LIST
             tabu_list.append(best_candidate)
-            #print("UPDATED TABU LIST = " , tabu_list , "\n\n")
         
         return best_solution , best_fitness
            
+    def gap(self , best_solution , opt_solution) :
+
+        gap = ( abs((opt_solution - best_solution)/(opt_solution)) )*100 
+        return gap
+
             
-
-
-
-
-
-
-
-
 #TESTING
 
 if __name__=="__main__" :
 
-    test = TSPReader(r"C:\Users\Cater\OneDrive\Desktop\git\TabuSearch\eil51.tsp")
-    opt_sol = 426
+    test = TSPReader("eil51.tsp" , "eil51.opt.tour.txt")
     test1 = TabuSearch(test.matrixDistance , test.coords, 100)
-    best_solution , best_fitness = test1.tabu_search()
-    print("INITIAL SOLUTION = " , test1.initial_solution , "\n\n")
-    print("BEST_SOLUTION = " , best_solution , "\n\n")
-    print("BEST_FITNESS = " , best_fitness , "\n\n")
-    print("INIT_FITNESS = " , test1.fitness(test1.initial_solution) , "\n\n")
+
+    #best_solution , best_fitness = test1.tabu_search()
+    
+    print("\n\n COORDS READ FROM THE TSP FILE : " , test.coords , "\n\n")
+    print(" RANDOM INITIAL SOLUTION = " , test1.initial_solution , "\n\n")
+
+    #list_of_solution = test1.two_opt_move(test1.initial_solution)
+    #print("TWO OPT MOVE RESULTS : " , list_of_solution , "\n\n")
+
+    neighborhood = test1.get_neighborhood(test1.initial_solution)
+    print("NEIGHBORHOOD = " , neighborhood , "\n\n")
+    #print("BEST_SOLUTION = " , best_solution , "\n\n")
+    #print("BEST_FITNESS = " , best_fitness , "\n\n")
+    #print("INIT_FITNESS = " , test1.fitness(test1.initial_solution) , "\n\n")
 
 
 
